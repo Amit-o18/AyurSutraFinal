@@ -1,0 +1,380 @@
+{% extends 'base.html'%}
+
+{% block title %}Therapy Tracking | AyurSutra{% endblock %}
+
+{% block content %}
+  <style>
+    .container {
+    max-width: 1100px;
+    margin: 90px auto 80px; /* allow for topbar */
+    padding: 20px;
+}
+
+/* Simple navbar used only inside the tracker template (falls back to topbar on other pages) */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.98), rgba(250,250,250,0.95));
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    z-index: 1100;
+}
+
+nav .logo { font-weight:700; color:var(--primary-blue); display:flex; align-items:center; gap:10px; }
+nav ul { display:flex; gap:18px; list-style:none; margin:0; padding:0; align-items:center; }
+nav ul li a { color: #234a46; text-decoration:none; font-weight:500; padding:8px 10px; border-radius:8px; }
+nav ul li a:hover { background: var(--light-blue); color: var(--primary-blue); }
+nav .profile { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#6dd3c8,#2ebfbb); }
+
+/* Page heading */
+.container h1 { margin: 6px 0 6px; font-size:28px; color:var(--primary-blue); }
+.container p { color:#485b58; margin-bottom:12px; }
+
+/* Booking widget and progress forms share card styles (override inline styles) */
+.container section > div[style], .container section > div.card {
+    background: #fff;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+/* Dashboard row */
+.dashboard-row { display:flex; gap:18px; align-items:flex-start; margin-top:18px; }
+.dashboard-stats { display:flex; flex-direction:column; gap:14px; flex:0 0 280px; }
+.dashboard-graphs { display:flex; gap:14px; flex:1; flex-wrap:wrap; }
+.dashboard-graphs .card { flex:1 1 300px; }
+.dashboard-stats .card { padding:16px; display:flex; flex-direction:column; gap:6px; }
+
+.card h2 { margin:0; font-size:20px; color:var(--primary-blue); }
+.card p { margin:0; color:#586c6a; }
+
+/* Status items */
+.status { display:flex; gap:14px; margin-top:12px; flex-wrap:wrap; }
+.status-item { background:#fff; padding:14px; border-radius:10px; box-shadow:var(--shadow); display:flex; gap:12px; align-items:center; min-width:220px; }
+.status-icon { font-size:22px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:8px; background:linear-gradient(135deg,#e6fffa,#dff6ef); }
+
+/* Appointment list and progress list styles */
+#tt-appointmentsList, #tp-list { display:flex; flex-direction:column; gap:10px; }
+.appt { padding:12px; border-radius:10px; background:#fbffff; border:1px solid #e6f4f3; }
+.appt .meta { color:#557a78; font-size:13px; margin-top:6px; }
+.cancel-btn { background:#ff6b6b; color:white; border:none; padding:8px 10px; border-radius:8px; cursor:pointer; }
+.cancel-btn:hover { filter:brightness(.95); }
+
+/* Therapy progress form inputs (override inline widths for consistency) */
+#tp-form input, #tp-form textarea, #tp-form select { width:100%; padding:8px; margin-bottom:8px; border:1px solid #d6eae7; border-radius:6px; }
+#tp-form label { display:block; margin-bottom:6px; color:#2b5250; font-weight:600; }
+
+/* Buttons */
+.cta-button, button { background: var(--accent-green); color: white; border: none; padding:10px 14px; border-radius:8px; font-weight:600; cursor:pointer; }
+.cta-button:hover, button:hover { filter:brightness(.96); }
+
+/* Charts: ensure canvas fill and responsive height */
+.chart { width:100% !important; height:220px !important; }
+
+/* Small utilities */
+.appointments-count { color:#006a63; font-weight:600; margin-left:6px; }
+
+/* Responsive adjustments */
+@media (max-width: 1000px) {
+    .container { padding:16px; margin-top:84px; }
+    .dashboard-row { flex-direction:column; }
+    .dashboard-stats { flex-direction:row; gap:12px; }
+    .dashboard-stats .card { flex:1; }
+}
+
+@media (max-width: 700px) {
+    .container { margin:80px 12px 60px; }
+    nav ul { display:none; }
+    .dashboard-graphs { flex-direction:column; }
+    .status { flex-direction:column; }
+}
+    </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+
+    <h1>Therapy Tracker</h1>
+    <p>Monitor your progress and stay on track with your therapy goals.</p>
+
+    <!-- Booking widget (server-backed) -->
+    <section style="margin:20px 0; display:flex; gap:16px; flex-wrap:wrap;">
+      <div style="flex:1 1 320px; background:#fff; padding:16px; border-radius:8px; box-shadow:var(--shadow);">
+        <h3>Book a Session</h3>
+        <form id="tt-bookingForm">
+          <label>Patient name</label>
+          <input type="text" id="tt-patientName" required style="width:100%; padding:8px; margin-bottom:8px;">
+          <label>Therapy</label>
+          <select id="tt-therapyType" style="width:100%; padding:8px; margin-bottom:8px;">
+            <option>Abhyanga</option>
+            <option>Swedana</option>
+            <option>Vamana</option>
+            <option>Virechana</option>
+            <option>Basti</option>
+          </select>
+          <label>Date</label>
+          <input type="date" id="tt-date" style="width:100%; padding:8px; margin-bottom:8px;">
+          <label>Time</label>
+          <input type="time" id="tt-time" style="width:100%; padding:8px; margin-bottom:8px;">
+          <button class="cta-button" id="tt-bookBtn" type="submit">Book</button>
+        </form>
+      </div>
+
+      <div style="flex:1 1 420px; background:#fff; padding:16px; border-radius:8px; box-shadow:var(--shadow);">
+        <h3>Upcoming Appointments <span id="tt-apptCount" class="appointments-count"></span></h3>
+        <div id="tt-appointmentsList">Loading…</div>
+      </div>
+    </section>
+
+
+    <!-- Dashboard Row: Stats and Graphs Side by Side -->
+    <div class="dashboard-row">
+      <div class="dashboard-stats">
+        <div class="card">
+          <p>Sessions Completed</p>
+          <h2>12</h2>
+        </div>
+        <div class="card">
+          <p>Average Mood Score</p>
+          <h2>7.8</h2>
+        </div>
+        <div class="card">
+          <p>Goal Progress</p>
+          <h2>60%</h2>
+        </div>
+      </div>
+      <div class="dashboard-graphs">
+        <div class="card">
+          <p>Mood Score Trend</p>
+          <h2>7.8 <span style="color:green; font-size:14px;">+5%</span></h2>
+          <p style="color:#666; font-size:14px;">Last 3 Months</p>
+          <canvas id="moodChart" class="chart"></canvas>
+        </div>
+        <div class="card">
+          <p>Session Attendance</p>
+          <h2>12 <span style="color:green; font-size:14px;">+10%</span></h2>
+          <p style="color:#666; font-size:14px;">Last 3 Months</p>
+          <canvas id="sessionChart" class="chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Status -->
+    <h2>Current Status</h2>
+    <div class="status">
+      <div class="status-item">
+        <div class="status-icon">📅</div>
+        <p><strong>Upcoming Appointment</strong><br>
+        <span style="color:#666; font-size:14px;">Next Session: July 15, 2024</span></p>
+      </div>
+      <div class="status-item">
+        <div class="status-icon">🎯</div>
+        <p><strong>Active Goal</strong><br>
+        <span style="color:#666; font-size:14px;">Current Goal: Improve sleep quality</span></p>
+      </div>
+      <div class="status-item">
+        <div class="status-icon">⏱</div>
+        <p><strong>Recent Activity</strong><br>
+        <span style="color:#666; font-size:14px;">Last Updated: July 8, 2024</span></p>
+      </div>
+    </div>
+
+    <!-- Therapy Progress: add / view entries -->
+    <section style="margin-top:20px; display:flex; gap:16px; flex-wrap:wrap;">
+      <div style="flex:1 1 360px; background:#fff; padding:16px; border-radius:8px; box-shadow:var(--shadow);">
+        <h3>Log Therapy Progress</h3>
+        <form id="tp-form">
+          <label>Patient name</label>
+          <input type="text" id="tp-patient" style="width:100%; padding:8px; margin-bottom:8px;">
+          <label>Date</label>
+          <input type="date" id="tp-date" style="width:100%; padding:8px; margin-bottom:8px;">
+          <label>Mood score (0-10)</label>
+          <input type="number" id="tp-mood" min="0" max="10" step="0.1" style="width:100%; padding:8px; margin-bottom:8px;">
+          <label>Progress %</label>
+          <input type="number" id="tp-percent" min="0" max="100" style="width:100%; padding:8px; margin-bottom:8px;">
+          <label>Notes</label>
+          <textarea id="tp-notes" style="width:100%; padding:8px; margin-bottom:8px;"></textarea>
+          <label><input type="checkbox" id="tp-completed"> Session completed</label>
+          <div style="margin-top:8px;"><button class="cta-button" id="tp-save">Save Progress</button></div>
+        </form>
+      </div>
+
+      <div style="flex:1 1 420px; background:#fff; padding:16px; border-radius:8px; box-shadow:var(--shadow);">
+        <h3>Recent Progress</h3>
+        <div id="tp-list">Loading…</div>
+      </div>
+    </section>
+    <!-- Button -->
+    <button>View Full Report</button>
+
+  </div>
+
+  <!-- Chart.js Script -->
+  <script>
+    // Mood Score Trend (Line Chart)
+    const ctx1 = document.getElementById('moodChart').getContext('2d');
+    new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+        datasets: [{
+          label: 'Mood Score',
+          data: [6.5, 7.0, 7.4, 8.0, 6.8, 7.8],
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.2)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: false, suggestedMin: 5, suggestedMax: 9 }
+        }
+      }
+    });
+
+    // Session Attendance (Bar Chart)
+    const ctx2 = document.getElementById('sessionChart').getContext('2d');
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+        datasets: [{
+          label: 'Sessions',
+          data: [3, 5, 4, 6, 2, 4],
+          backgroundColor: '#60a5fa'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, stepSize: 1 }
+        }
+      }
+    });
+  </script>
+  <script>
+    // Small client to wire therapy-tracking booking UI to backend APIs
+    (function(){
+      const listEl = document.getElementById('tt-appointmentsList');
+      const countEl = document.getElementById('tt-apptCount');
+      const form = document.getElementById('tt-bookingForm');
+      const nameInput = document.getElementById('tt-patientName');
+      const therapyInput = document.getElementById('tt-therapyType');
+      const dateInput = document.getElementById('tt-date');
+      const timeInput = document.getElementById('tt-time');
+
+      async function load(date){
+        try{
+          const res = await fetch(`/api/atss/appointments/?date=${encodeURIComponent(date||'')}`);
+          const body = await res.json();
+          const items = body.appointments || [];
+          render(items);
+        }catch(e){ console.error(e); listEl.innerHTML = '<p>Error loading</p>'; }
+      }
+
+      function render(items){
+        countEl.textContent = `(${items.length})`;
+        if(items.length===0){ listEl.innerHTML = '<p>No appointments</p>'; return }
+        listEl.innerHTML = '';
+        items.forEach(a=>{
+          const div = document.createElement('div'); div.className='appt';
+          div.innerHTML = `<strong>${a.patient}</strong><div class="meta">${a.date} @ ${a.time} — ${a.therapy}</div>`;
+          const btn = document.createElement('button'); btn.textContent='Cancel'; btn.className='cancel-btn';
+          btn.addEventListener('click', async ()=>{
+            if(!confirm('Cancel this appointment?')) return;
+            await fetch(`/api/atss/appointments/${a.id}/cancel/`, { method: 'POST' });
+            await load(dateInput.value || '');
+          });
+          div.appendChild(btn);
+          listEl.appendChild(div);
+        });
+      }
+
+      form.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const payload = { patient: nameInput.value.trim(), therapy: therapyInput.value, date: dateInput.value, time: timeInput.value };
+        const res = await fetch('/api/atss/appointments/create/', { method:'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const body = await res.json();
+        if(res.ok && body.appointment){
+          nameInput.value=''; timeInput.value='';
+          await load(dateInput.value || '');
+          alert('Appointment booked');
+        } else {
+          alert('Could not book: ' + (body.error || 'unknown'));
+        }
+      });
+
+      // initialize
+      dateInput.value = new Date().toISOString().slice(0,10);
+      load(dateInput.value);
+      dateInput.addEventListener('change', ()=> load(dateInput.value));
+    })();
+  </script>
+  <script>
+    // Therapy Progress client
+    (function(){
+      const listEl = document.getElementById('tp-list');
+      const form = document.getElementById('tp-form');
+      const patientInput = document.getElementById('tp-patient');
+      const dateInput = document.getElementById('tp-date');
+      const moodInput = document.getElementById('tp-mood');
+      const percentInput = document.getElementById('tp-percent');
+      const notesInput = document.getElementById('tp-notes');
+      const completedInput = document.getElementById('tp-completed');
+
+      async function loadProgress(){
+        try{
+          const res = await fetch('/api/atss/progress/');
+          const body = await res.json();
+          const items = body.progress || [];
+          render(items.slice(0,20));
+        }catch(e){ console.error(e); listEl.innerHTML = '<p>Error loading</p>'; }
+      }
+
+      function render(items){
+        if(items.length===0){ listEl.innerHTML = '<p>No entries</p>'; return }
+        listEl.innerHTML = '';
+        items.forEach(p=>{
+          const d = document.createElement('div'); d.className='appt';
+          d.innerHTML = `<strong>${p.patient}</strong> <div class="meta">${p.date} — mood: ${p.mood_score || '-'} — ${p.progress_percent || '-'}% ${p.session_completed?'<span style="color:green">(done)</span>':''}</div><div style="margin-top:6px">${p.notes||''}</div>`;
+          listEl.appendChild(d);
+        });
+      }
+
+      form.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const payload = {
+          patient: patientInput.value.trim() || 'Anonymous',
+          date: dateInput.value || new Date().toISOString().slice(0,10),
+          mood_score: moodInput.value || null,
+          progress_percent: percentInput.value || null,
+          session_completed: completedInput.checked,
+          notes: notesInput.value || ''
+        };
+        const res = await fetch('/api/atss/progress/create/', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+        const body = await res.json();
+        if(res.ok && body.progress){
+          patientInput.value=''; moodInput.value=''; percentInput.value=''; notesInput.value=''; completedInput.checked=false;
+          await loadProgress();
+          alert('Progress saved');
+        } else {
+          alert('Could not save progress: ' + (body.error || 'unknown'));
+        }
+      });
+
+      dateInput.value = new Date().toISOString().slice(0,10);
+      loadProgress();
+    })();
+  </script>
+{%endblock%}

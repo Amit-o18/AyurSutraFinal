@@ -1,0 +1,264 @@
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Nunito Sans', 'Poppins', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #a7ffd1, #cdebeb, #9dd7f6);
+    color: #325f57;
+    position: relative;
+}
+
+/* Container */
+.auth-container {
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: transparent; /* Gradient already on body */
+}
+
+/* Card */
+.auth-card {
+    /* background: #FFFFFF; */
+    border-radius: 24px;
+    /* box-shadow: 0 10px 40px rgba(47, 111, 78, 0.2); */
+    padding: 2.5rem 2rem 2rem 2rem;
+    max-width: 420px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.6s ease;
+}
+
+/* Header */
+.auth-header {
+    display: flex;
+    display: inline-block;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+.logo {
+    width: 64px;
+    margin-bottom: 0.75rem;
+}
+#form-title {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(90deg, #1e4f36, #3d8cc1, #0046c9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+#form-subtitle {
+    color: #3BC9B0;
+    font-size: 1rem;
+    margin: 0.25rem 0 0 0;
+}
+
+/* Role Toggle */
+.role-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+}
+.role-toggle button {
+    background: #E6FAF5;
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1.5rem;
+    font-size: 1rem;
+    color: #000000;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.role-toggle button.active {
+    background: linear-gradient(90deg, #2F6F4E, #3BC9B0);
+    color: #fff;
+}
+
+/* Inputs */
+.form-group {
+    margin-bottom: 1rem;
+    
+}
+.form-group label {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: #2F6F4E;
+    font-weight: 600;
+}
+.form-group input,
+#select{
+    width: 461px;
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid #3BC9B0;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: #F8FFFD;
+    color: #1E3D38;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    margin-right: 20px;
+     ;
+}
+.form-group #gender{
+    width: 489px;
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid #3BC9B0;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: #F8FFFD;
+    color: #1E3D38;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.form-group #branch{
+    width: 489px;
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid #3BC9B0;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: #F8FFFD;
+    color: #1E3D38;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #2F6F4E;
+    box-shadow: 0 0 6px rgba(47, 111, 78, 0.3);
+    outline: none;
+}
+
+/* Checkbox */
+.form-group.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+}
+.form-group.checkbox input {
+    width: auto;
+    margin: 0;
+}
+
+/* CTA Buttons */
+.cta-btn {
+    width: 100%;
+    padding: 0.85rem;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.cta-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+.cta-btn.green {
+    background: linear-gradient(90deg, #2F6F4E, #3BC9B0);
+    color: #fff;
+}
+.cta-btn.gold {
+    background: #64C3F7;
+    color: #fff;
+}
+
+/* Links */
+.switch-auth,
+.practitioner-apply {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+}
+.switch-auth a,
+.practitioner-apply a {
+    color: #3BC9B0;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.switch-auth a:hover,
+.practitioner-apply a:hover {
+    color: #2F6F4E;
+}
+
+/* Divider */
+.divider {
+    text-align: center;
+    color: #2F6F4E;
+    margin: 1.2rem 0 0.7rem 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* Social Login */
+.social-login {
+    display: flex;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-bottom: 0.7rem;
+}
+.social-btn {
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    background: #E6FAF5;
+    color: #2F6F4E;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(47, 111, 78, 0.15);
+    transition: all 0.2s ease;
+}
+.social-btn:hover {
+    background: #3BC9B0;
+    color: #fff;
+}
+.social-btn.google { background: #fff; }
+.social-btn.facebook { background: #E6F0FA; }
+.social-btn.apple { background: #F5F5F5; }
+
+/* Forgot Password */
+.forgot-password {
+    text-align: right;
+    margin-bottom: 0.5rem;
+}
+.forgot-password a {
+    color: #3BC9B0;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.forgot-password a:hover {
+    color: #2F6F4E;
+}
+
+/* Background Motif (optional SVG) */
+.auth-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url('ayurveda-motif.svg') no-repeat bottom right/300px auto;
+    opacity: 0.07;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Animation */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}

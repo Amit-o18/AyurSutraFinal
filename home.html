@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Home | AyurSutra{% endblock %}
+
+{% block content %}
+<main class="content">
+    <h2 class="content-title">Welcome to AyurSutra</h2>
+    <p>AyurSutra- Panchakarma Patient Management and therapy scheduling.</p>
+    <div class="dashboard-cards">
+        <a href="/atss" class="card">
+            <i class="fa-solid fa-users-viewfinder"></i>
+            <h3>Therapy Scheduling System</h3>
+            <p>Streamline your therapy sessions with our automated scheduling.</p>
+            <div class="cta-button">Start Now</div>
+        </a>
+        <a href="#" class="card">
+            <i class="fa-solid fa-calendar-check"></i>
+            <h3>RealTime Therapy Tracking</h3>
+            <p>Track your therapy sessions in real-time.</p>
+            <div class="cta-button">Track Now</div>
+        </a>
+        <a href="/health-records" class="card">
+            <i class="fa-solid fa-book-medical"></i>
+            <h3>Visualization & Analytics Tools</h3>
+            <p>Gain insights into your therapy progress with our analytics dashboard.</p>
+            <div class="cta-button">View Graphs</div>
+        </a>
+    </div>
+    </main>
+    <script>
+    // JavaScript for Sidebar Toggle Functionality
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    // Add a click event listener to the toggle button
+    menuToggle.addEventListener('click', () => {
+        // Toggle the 'is-open' class on the sidebar
+        // This class controls the visibility and animation via CSS
+        sidebar.classList.toggle('is-open');
+    });
+</script>
+    {% endblock %}

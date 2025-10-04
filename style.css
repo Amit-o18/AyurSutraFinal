@@ -1,0 +1,619 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary-blue: #004d99;
+    --light-blue: #e6f2ff;
+    --accent-green: #2ecc71;
+    --text-dark: #333;
+    --text-light: #f4f4f4;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f2f5;
+    color: var(--text-dark);
+    overflow-x: hidden;
+}
+
+/* ========= TOPBAR ========= */
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background-color: white;
+    color: var(--text-dark);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.topbar .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+.topbar .logo i {
+    font-size: 28px;
+    color: var(--accent-green);
+}
+
+.topbar .menu {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.topbar .menu .main-links,
+.topbar .menu .utility-icons {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.topbar .menu a.menu-item {
+    color: var(--text-dark);
+    text-decoration: none;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s;
+    position: relative;
+    font-weight: 500;
+}
+
+.topbar .menu a.menu-item:hover {
+    background-color: var(--light-blue);
+    color: var(--primary-blue);
+}
+
+.topbar .menu a.icon-only .tooltip-text {
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, bottom 0.3s ease;
+    white-space: nowrap;
+}
+
+.topbar .menu a.icon-only:hover .tooltip-text {
+    opacity: 1;
+    bottom: -45px;
+}
+
+/* Hide the mobile menu toggle by default (for desktop) */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--primary-blue);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* ========= WRAPPER & LAYOUT ========= */
+.wrapper {
+    display: flex;
+    margin-top: 70px;
+    min-height: calc(100vh - 70px);
+    position: relative;
+}
+
+/* ========= SIDEBAR (Desktop) ========= */
+.sidebar {
+    width: 250px;
+    background: white;
+    height: calc(100vh - 70px);
+    padding: 20px 0;
+    border-right: 1px solid #ddd;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+    transition: transform 0.3s ease-in-out;
+    z-index: 999;
+}
+
+.sidebar h2 {
+    margin: 0 20px 25px;
+    padding: 0;
+    font-size: 18px;
+    color: var(--primary-blue);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    margin-bottom: 5px;
+    color: var(--text-dark);
+    text-decoration: none;
+    font-size: 15px;
+    transition: background 0.3s, color 0.3s;
+}
+
+.sidebar a i {
+    font-size: 18px;
+}
+
+.sidebar a:hover {
+    background: var(--light-blue);
+    color: var(--primary-blue);
+}
+
+.sidebar a.active {
+    background: var(--primary-blue);
+    color: var(--text-light);
+    border-left: 5px solid var(--accent-green);
+    padding-left: 15px;
+    font-weight: 600;
+}
+
+/* ========= CONTENT & DASHBOARD LAYOUT ========= */
+.content {
+    flex: 1;
+    padding: 30px;
+    background: #f0f2f5;
+}
+
+.content h2.content-title {
+    margin-top: 0;
+    color: var(--primary-blue);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    justify-content: left;
+}
+
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card i {
+    font-size: 40px;
+    color: var(--accent-green);
+    margin-bottom: 15px;
+}
+
+.card h3 {
+    margin: 0;
+    color: var(--primary-blue);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.card p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 0;
+}
+
+.card .cta-button {
+    background: var(--accent-green);
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-top: 15px;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.card .cta-button:hover {
+    background: #27ae60;
+}
+
+/* ========= RESPONSIVE STYLES FOR MOBILE AND TABLET ========= */
+@media (max-width: 900px) {
+
+    /* Hide desktop nav links on smaller screens */
+    .topbar .menu .main-links {
+        display: none;
+    }
+
+    /* Show the mobile menu toggle button */
+    .menu-toggle {
+        display: block;
+    }
+
+    /* Set the sidebar's mobile position */
+    .sidebar {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        transform: translateX(-100%);
+        /* Hide the sidebar off-screen */
+        width: 250px;
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Class added by JavaScript to show the sidebar */
+    .sidebar.is-open {
+        transform: translateX(0);
+        /* Slide the sidebar into view */
+    }
+
+    /* Adjust the main content area to take full width on mobile */
+    .wrapper {
+        flex-direction: column;
+        margin-top: 70px;
+    }
+
+    .content {
+        width: 100%;
+        margin-top: 0;
+    }
+}
+
+/* Automated Therapy Scheduling System Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Nunito Sans', 'Poppins', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #4ad0c7e9, #bddada, #4ad0c7e9);
+    color: #325f57;
+    position: relative;
+}
+
+/* ===== SCHEDULER LAYOUT ===== */
+.scheduler {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 16px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    
+}
+
+/* Improved scheduler layout using flex for better control */
+.scheduler {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.slot {
+    padding: 8px 10px;
+    background: #00bcd4; /* Aqua tone */
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid #b2ebf2; /* Light aqua border */
+}
+
+.slot.selected {
+    background: #0078d7; /* Primary blue */
+    color: white;
+}
+
+#appointmentsList .appt {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    background: #e0f7fa; /* Soft aqua background */
+}
+
+#appointmentsList .appt .meta {
+    color: #38818e; /* Deep green for metadata */
+    font-size: 13px;
+}
+
+@media (max-width:900px) {
+    .scheduler {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+.scheduler-card {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    flex-wrap: wrap;
+        margin-bottom: 10px;
+        border: 2px solid black;
+        border-radius: 10px;
+}
+
+/* ===== CARD STYLES ===== */
+.scheduler-card1 {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 10px;
+    border: 1px solid #c8e6c9; /* Light green border */
+    box-shadow: 0 2px 6px rgba(0, 150, 136, 0.06);
+    flex: 1 1 260px; /* grow, shrink, basis */
+    min-width: 260px;
+    margin-bottom: 10px;
+}
+
+.scheduler-card1 #slots {
+    border: 1px;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.scheduler-card2 {
+    padding: 18px;
+    border-radius: 10px;
+    border: 1px solid #81c784; /* Medium green border */
+    box-shadow: var(--shadow);
+    background-color:  #ffffff;
+    flex: 2 1 360px;
+    min-width: 280px;
+    margin-bottom: 10px;
+}
+
+.scheduler-card2 form label,
+.scheduler-card2 form input,
+.scheduler-card2 form select,
+.scheduler-card2 form button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.scheduler-card2 form input,
+.scheduler-card2 form select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.scheduler-card3 {
+    padding: 18px;
+    margin: 12px 0;
+    border-radius: 10px;
+    border: 1px solid #90caf9; /* Blue border */
+    box-shadow: var(--shadow);
+    width: auto;
+    display: inline-block;
+    background-color: #ffffff; /* Light blue background */
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-bottom: 10px;
+}
+
+.scheduler-card4 {
+    padding: 18px;
+    border-radius: 10px;
+    border: 1px solid #90caf9; /* Blue border */
+    box-shadow: var(--shadow);
+    background-color: #ffffff;
+    flex: 1 1 200px;
+    min-width: 200px;
+    margin-bottom: 10px;
+}
+
+/* Appointment item visuals */
+.appt {
+    background: #ffffff;
+    border: 1px solid #e6f2f2;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+.appt .meta {
+    color: #4a6b6a;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+/* Toast notifications */
+.toast {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    z-index: 2000;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .18s ease, transform .18s ease;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* Disabled button */
+.cta-button[disabled], .cta-button.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(.02);
+}
+
+/* Appointment actions */
+.appt-actions { display:flex; gap:8px; margin-top:8px; }
+.appt .cancel-btn { background: #ff6b6b; border-radius:6px; padding:6px 10px; color:#fff; border:none; cursor:pointer; }
+.appt .cancel-btn:hover { filter:brightness(.95); }
+
+/* Count badge */
+.appointments-count { font-size:13px; color:#00514f; font-weight:600; margin-left:8px; }
+
+/* Slot visuals */
+.slots { display:flex; flex-wrap:wrap; gap:10px; }
+.slot {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #e0f7f4;
+    color: #014d44;
+    cursor: pointer;
+    border: 1px solid rgba(1,77,68,0.08);
+    transition: transform .12s ease, box-shadow .12s ease;
+}
+.slot:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.06); }
+.slot.selected { background: #00b8a9; color: #fff; }
+.slot.taken { background: #f6f6f6; color: #999; cursor: not-allowed; }
+
+@media (max-width: 900px) {
+    .scheduler { flex-direction: column; }
+    .scheduler-card1, .scheduler-card2, .scheduler-card4 { min-width: auto; }
+}
+
+/* ===== MOBILE PADDING ===== */
+@media (max-width: 420px) {
+    .scheduler-card {
+        padding: 12px;
+        margin: 10px 0;
+    }
+}
+.content-title {
+    padding: 20px 0px 20px 0px;
+    margin-bottom: 30px;
+    color: #004d99;
+    text-align: left; /* changed from center to left */
+    font-weight: 700;
+    font-size: 35px;
+}
+
+/* Ensure very small screens still look good: allow a centered fallback */
+@media (max-width: 420px) {
+    .content-title {
+        text-align: center;
+        font-size: 28px;
+        padding-left: 0;
+    }
+}
+.content p{
+
+    margin: 0 0 20px 8px    ;
+}
+
+/* Wellness Tips Styles */
+.tip-container {
+    max-width: 700px;              /* total width including buttons */
+    margin: 60px auto;
+    display: flex;                  /* side-by-side layout */
+    align-items: stretch;           /* buttons stretch with tip-box */
+    position: relative;
+}
+
+.tip-box {
+    flex: 1;                        /* take all available width except buttons */
+    background: white;
+    border-radius: 15px;
+    padding: 40px 30px;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.tip-box h2 {
+    color: var(--primary-blue);
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.tip-box p {
+    color: var(--text-dark);
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Vertical buttons on the right, stretched */
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-left: 15px;           
+}
+
+.buttons button {
+    flex: 1;                       
+    background-color: var(--primary-blue);
+    color: var(--text-light);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.buttons button:hover {
+    background-color: var(--accent-green);
+    transform: translateY(-2px);
+}
+
+/* Mobile fallback */
+@media (max-width: 700px) {
+    .tip-container {
+        flex-direction: column;
+    }
+    .buttons {
+        flex-direction: row;
+        margin-left: 0;
+        margin-top: 20px;
+    }
+    .buttons button {
+        flex: none;
+        width: auto;
+    }
+}
+
+/* ===== Therapy Tracker Page Styles ===== */
+
+/* Page container used by templates/therapy-tracking.html */

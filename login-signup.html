@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AyurSutra - Sign Up & Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,700|Poppins:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/login.css">
+</head>
+<body>
+    {% load static %}
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1 id="form-title"><i class="fa-solid fa-hospital"></i> Welcome to AyurSutra</h1>
+                <p id="form-subtitle">Holistic Panchakarma Patient & Practitioner Portal</p>
+            </div>
+            <div class="role-toggle">
+                <button id="patient-toggle" class="active">Patient</button>
+                <button id="practitioner-toggle">Practitioner</button>
+            </div>
+            <form id="signup-form" method="post" action="{% url 'auth' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="fullname">Full Name</label>
+                    <input type="text" id="fullname" name="fullname" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                </div>
+                <div id="patient-fields">
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" name="age">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender">
+                            <option value="">Select</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="medical-id">Medical ID (optional)</label>
+                        <input type="text" id="medical-id" name="medical-id">
+                    </div>
+                </div>
+                <div id="practitioner-fields" style="display:none;">
+                    <div class="form-group">
+                        <label for="specialization">Specialization</label>
+                        <input type="text" id="specialization" name="specialization" placeholder="Ayurveda, Panchakarma, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label for="experience">Years of Experience</label>
+                        <input type="number" id="experience" name="experience">
+                    </div>
+                    <div class="form-group">
+                        <label for="license">License/Reg. Number</label>
+                        <input type="text" id="license" name="license">
+                    </div>
+                    <div class="form-group">
+                        <label for="clinic">Clinic/Branch Name</label>
+                        <input type="text" id="clinic" name="clinic">
+                    </div>
+                </div>
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">I agree to Terms & Privacy Policy</label>
+                </div>
+                <button type="submit" class="cta-btn green">Create Account</button>
+                <div class="switch-auth">
+                    Already have an account? <a href="#" id="switch-to-login">Login</a>
+                </div>
+            </form>
+            <form id="login-form" method="post" action="{% url 'auth' %}" style="display:none;">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" name="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="login-password" required>
+                </div>
+                
+             
+                <div class="forgot-password">
+                    <a href="#">Forgot Password?</a>
+                </div>
+                <button type="submit" class="cta-btn gold">Login</button>
+                <div class="divider">— Or Continue with —</div>
+                <div class="social-login">
+                    <button class="social-btn google">Google</button>
+                    <button class="social-btn facebook">Facebook</button>
+                    <button class="social-btn apple">Apple</button>
+                </div>
+                <div class="switch-auth">
+                    Don’t have an account? <a href="#" id="switch-to-signup">Sign Up</a>
+                </div>
+                <div class="practitioner-apply">
+                    Practitioner? <a href="#">Apply here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="/static/login.js"></script>
+</body>
+</html>

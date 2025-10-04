@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Realtime Therapy Tracking | AyurSutra{% endblock %}
+
+{% block content %}
+<main class="content">
+    <h2 class="content-title"><b>Automated Therapy Scheduling System</b></h2>
+    <p>Effortlessly manage and schedule your Panchakarma therapies with our automated system.</p>
+    <div class="scheduler">
+    <div class="scheduler-card">
+
+            <div class="scheduler-card1">
+                <h3>Select Date</h3>
+                <input type="date" id="datePicker">
+
+                <h3 style="margin-top:16px">Available Time Slots</h3>
+                <div id="slots" class="slots">
+                    <!-- slots injected here -->
+                </div>
+            </div>
+            <div class="scheduler-card2">
+                <h3>Book Appointment</h3>
+                <form id="bookingForm">
+                    <label>Patient Name</label>
+                    <input type="text" id="patientName" required>
+
+                    <label>Therapy Type</label>
+                    <select id="therapyType">
+                        <option>Abhyanga</option>
+                        <option>Swedana</option>
+                        <option>Vamana</option>
+                        <option>Virechana</option>
+                        <option>Basti</option>
+                    </select>
+
+                    <label>Time Slot</label>
+                    <input type="text" id="selectedSlot" readonly placeholder="Choose a slot from the list">
+
+                    <button type="submit" id="bookBtn" class="cta-button" disabled>Book Appointment</button>
+                </form>
+            </div>
+        </div>
+            <div class="scheduler-card3">
+                <h3>Upcoming Appointments <span id="apptCount" class="appointments-count"></span></h3>
+                <div id="appointmentsList">
+                    <!-- appointments injected here -->
+                </div>
+            </div>
+            <div class="scheduler-card4">
+                <h3>Controls</h3>
+                <button id="clearAll" class="cta-button" style="background:#e74c3c">Clear All Appointments</button>
+            </div>
+    </div>
+
+    <script>
+    (function(){
+        const datePicker = document.getElementById('datePicker');
+        const slotsEl = document.getElementById('slots');
+        const selectedSlotInput = document.getElementById('selectedSlot');
+        const bookingForm = document.getElementById('bookingForm');
+        const appointmentsList = document.getElementById('appointmentsList');
+        const patientName = document.getElementById('patientName');
+        const therapyType = document.getElementById('therapyType');
+        const clearAll = document.getElementById('clearAll');
+
+        const STORAGE_KEY = 'ayursutra_appointments_v1';
+
+        // Simple slot generator (9:00 to 16:00 every 60 minutes)
+        function generateSlots(){
+            const slots = [];
+            for(let h=9; h<=16; h++){
+                slots.push((h<10? '0'+h : h) + ':00');
+            }
+            return slots;
+        }
+
+        function loadAppointments(){
+            try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }catch(e){ return [] }
+        }
+
+        function saveAppointments(items){ localStorage.setItem(STORAGE_KEY, JSON.stringify(items || [])); }
+
+        function renderSlots(dateStr){
+            slotsEl.innerHTML = '';
+            const slots = generateSlots();
+            const appointments = loadAppointments().filter(a=>a.date===dateStr);
+            slots.forEach(s=>{
+                const taken = appointments.some(a=>a.time===s);
+                const btn = document.createElement('div');
+                btn.className = 'slot' + (taken? ' taken' : '');
+                btn.textContent = s + (taken? ' (Booked)' : '');
+                // make slot keyboard accessible
+                btn.setAttribute('role', 'button');
+                btn.tabIndex = 0;
+                if(!taken){
+                    btn.addEventListener('click', ()=>{
+                        // clear other selections
+                        slotsEl.querySelectorAll('.slot').forEach(x=>x.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        selectedSlotInput.value = s;
+                    });
+                    btn.addEventListener('keydown', (ev)=>{
+                        if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); btn.click(); }
+                    });
+                } else {
+                    btn.style.opacity = '0.6';
+                    btn.style.cursor = 'not-allowed';
+                    btn.setAttribute('aria-disabled', 'true');
+                }
+                slotsEl.appendChild(btn);
+            });
+        }
+
+        function renderAppointments(){
+            const items = loadAppointments();
+            appointmentsList.innerHTML = '';
+            const countEl = document.getElementById('apptCount');
+            countEl.textContent = items.length ? `(${items.length})` : '(0)';
+            if(items.length===0){ appointmentsList.innerHTML = '<p>No appointments yet.</p>'; return }
+            // sort by date then time
+            items.sort((a,b)=>{
+                const ka = a.date + 'T' + a.time;
+                const kb = b.date + 'T' + b.time;
+                return ka.localeCompare(kb);
+            });
+
+            items.forEach(a=>{
+                const wrap = document.createElement('div'); wrap.className='appt';
+
+                const title = document.createElement('div');
+                title.innerHTML = `<strong>${escapeHtml(a.patient || 'Unknown')}</strong>`;
+
+                const meta = document.createElement('div'); meta.className = 'meta';
+                meta.textContent = `${a.date} @ ${a.time} — ${a.therapy}`;
+
+                const actions = document.createElement('div'); actions.className='appt-actions';
+                const del = document.createElement('button');
+                del.innerHTML='Cancel'; del.className='cancel-btn';
+                del.addEventListener('click', ()=>{
+                    const all = loadAppointments().filter(x=> x.id !== a.id);
+                    saveAppointments(all);
+                    renderSlots(datePicker.value);
+                    renderAppointments();
+                    showToast('Appointment cancelled');
+                });
+                actions.appendChild(del);
+
+                wrap.appendChild(title);
+                wrap.appendChild(meta);
+                wrap.appendChild(actions);
+                appointmentsList.appendChild(wrap);
+            })
+        }
+
+        // small helper to avoid XSS when injecting user-provided text
+        function escapeHtml(str){
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // initialize
+        const today = new Date().toISOString().slice(0,10);
+        datePicker.value = today;
+        renderSlots(today);
+        renderAppointments();
+        // toast helper
+        const toastEl = document.createElement('div'); toastEl.className='toast'; document.body.appendChild(toastEl);
+        function showToast(msg, timeout=2000){ toastEl.textContent = msg; toastEl.classList.add('show'); setTimeout(()=> toastEl.classList.remove('show'), timeout); }
+
+        const bookBtn = document.getElementById('bookBtn');
+        function updateBookState(){
+            const slot = selectedSlotInput.value; const nameOk = patientName.value.trim().length>1;
+            if(slot && nameOk){ bookBtn.removeAttribute('disabled'); } else { bookBtn.setAttribute('disabled',''); }
+        }
+
+        datePicker.addEventListener('change', ()=> {
+            selectedSlotInput.value = '';
+            renderSlots(datePicker.value);
+            renderAppointments();
+            updateBookState();
+        });
+        patientName.addEventListener('input', updateBookState);
+        slotsEl.addEventListener('click', updateBookState);
+
+        bookingForm.addEventListener('submit', (e)=>{
+            e.preventDefault();
+            const slot = selectedSlotInput.value;
+            if(!slot){ showToast('Please choose a free time slot'); return }
+            const items = loadAppointments();
+            // double-check slot free
+            if(items.some(x=> x.date===datePicker.value && x.time===slot)){
+                showToast('Slot already taken'); return;
+            }
+            const appt = { id: Date.now().toString(36), date: datePicker.value, time: slot, patient: patientName.value.trim() || 'Unknown', therapy: therapyType.value };
+            items.push(appt); saveAppointments(items);
+            patientName.value=''; selectedSlotInput.value=''; updateBookState();
+            renderSlots(datePicker.value); renderAppointments();
+            showToast('Appointment booked successfully');
+        });
+
+        clearAll.addEventListener('click', ()=>{
+            if(!confirm('Clear all appointments?')) return;
+            saveAppointments([]); renderSlots(datePicker.value); renderAppointments();
+            showToast('All appointments cleared');
+        });
+    })();
+    </script>
+
+
+{% endblock %}
+

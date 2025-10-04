@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Wellness Tips | MediGenie{% endblock %}
+
+{% block content %}
+<main class="content">
+    <h2 class="content-title">Wellness Tips</h2>
+    <p>Discover daily tips to enhance your well-being:</p>
+
+    <div class="tip-container">
+    <div class="tip-box">
+        <h2 id="tip-title"></h2>
+        <p id="tip-description"></p>
+    </div>
+    <div class="buttons">
+        <button onclick="prevTip()">Previous</button>
+        <button onclick="nextTip()">Next</button>
+    </div>
+</div>
+
+</main>
+
+    <script>
+        const tips = [
+            {% for tip in tips %}
+                {title: "{{ tip.title|escapejs }}", description: "{{ tip.description|escapejs }}"}
+                {% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        let index = 0;
+
+        function showTip() {
+            document.getElementById('tip-title').innerText = tips[index].title;
+            document.getElementById('tip-description').innerText = tips[index].description;
+        }
+
+        function nextTip() {
+            index = (index + 1) % tips.length;
+            showTip();
+        }
+
+        function prevTip() {
+            index = (index - 1 + tips.length) % tips.length;
+            showTip();
+        }
+
+        if (tips.length > 0) {
+            showTip();
+        } else {
+            document.getElementById('tip-title').innerText = "No tips available";
+            document.getElementById('tip-description').innerText = "Try again later.";
+        }
+    </script>
+{% endblock %}
